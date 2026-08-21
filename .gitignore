@@ -1,0 +1,85 @@
+# Operating system
+.DS_Store
+Thumbs.db
+
+# Editors and IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.venv/
+venv/
+env/
+
+# C / C++ / CMake
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+compile_commands.json
+makedep*
+*.o
+*.obj
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+
+# ROS 2 / colcon
+install/
+log/
+*.repos.bak
+
+# Firmware / embedded tooling
+*.elf
+*.bin
+*.hex
+*.map
+*.lst
+*.axf
+*.d
+*.su
+*.gcda
+*.gcno
+
+# Test and profiling outputs
+coverage/
+test-results/
+*.prof
+*.profraw
+*.profdata
+
+# Archives and local exports
+*.zip
+*.tar
+*.tar.gz
+
+# Environment and secrets
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Large temporary datasets and logs
+*.log
+tmp/
+temp/
+
+# Optional experiment outputs
+# Keep selected plots/results intentionally when they are part of repo evidence.

@@ -2,7 +2,7 @@
 
 `robotic-stack` is a robotics portfolio monorepo for building and validating a reusable robotics architecture from embedded control up to integrated robotic applications.
 
-The portfolio is planned to progress in stages:
+The planned development path is:
 
 1. stationary robot arm bring-up,
 2. reusable embedded control and communication infrastructure,
@@ -10,20 +10,7 @@ The portfolio is planned to progress in stages:
 4. a mobile manipulator using the same architecture,
 5. multi-robot collaboration and final scenario validation.
 
-The engineering goal is not to collect disconnected demos. The goal is to show reliable, measured, explainable robotics across:
-
-- embedded systems,
-- feedback control,
-- actuator and sensor interfaces,
-- communication,
-- estimation,
-- ROS 2 integration,
-- kinematics and planning,
-- perception and calibration,
-- navigation,
-- safety and fault handling,
-- experiments and quantitative validation,
-- technical documentation.
+The goal is not to collect disconnected demos. The goal is to show reliable, measured, explainable robotics across embedded systems, control, communication, estimation, ROS 2, perception, planning, navigation, safety, and quantitative validation.
 
 ## Current Status
 
@@ -32,8 +19,8 @@ This repository is at the initial bootstrap stage.
 Current contents:
 
 - repository instructions in `AGENTS.md`,
-- Git workflow in `GIT_WORKFLOW.md`,
-- portfolio roadmap in `robotics_portfolio_9_month_plan_README.md`.
+- development workflow in `docs/development/GIT_WORKFLOW.md`,
+- portfolio roadmap in `docs/plans/robotic-stack-plan.md`.
 
 Implementation work has not started yet.
 
@@ -67,12 +54,12 @@ This repository follows a branch-based workflow:
 - task branches open pull requests into `dev`,
 - milestone releases merge `dev` into `main`.
 
-Detailed workflow rules are documented in `GIT_WORKFLOW.md`.
+Detailed workflow rules are documented in `docs/development/GIT_WORKFLOW.md`.
 
-## Source Documents
+## Key Documents
 
 - `AGENTS.md`
-- `GIT_WORKFLOW.md`
-- `robotics_portfolio_9_month_plan_README.md`
+- `docs/development/GIT_WORKFLOW.md`
+- `docs/plans/robotic-stack-plan.md`
 
-These documents define the current repository constraints, workflow, and project direction.
+These documents define the repository constraints, workflow, and project direction.

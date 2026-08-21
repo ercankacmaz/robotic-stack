@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - dev
+      - main
+  push:
+    branches:
+      - dev
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  repository-sanity:
+    name: Repository sanity
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify expected bootstrap files exist
+        run: |
+          test -f README.md
+          test -f AGENTS.md
+          test -f .gitignore
+          test -f .github/pull_request_template.md
+          test -f docs/development/GIT_WORKFLOW.md
+          test -f docs/plans/robotic-stack-plan.md
+
+      - name: Verify README references current documentation paths
+        run: |
+          grep -Fq 'docs/development/GIT_WORKFLOW.md' README.md
+          grep -Fq 'docs/plans/robotic-stack-plan.md' README.md
+
+      - name: List tracked top-level structure
+        run: |
+          printf 'Top-level repository entries:\n'
+          find . -maxdepth 2 -mindepth 1 \
+            ! -path './.git' \
+            ! -path './.git/*' \
+            | sort

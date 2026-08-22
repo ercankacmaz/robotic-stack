@@ -5,7 +5,7 @@
 **Primary goal:** Build a credible, technically deep portfolio that demonstrates the ability to design, implement, integrate, test, and document robotic systems from embedded control up to autonomous multi-robot behavior.  
 **Planned duration:** 9 months  
 **Recommended workload:** 12–15 hours/week average  
-**Primary hardware sequence:** Stationary robot arm first → mobile manipulator later  
+**Primary hardware sequence:** Stationary robot arm first (RoArm M3 with custom ESP32 firmware) → mobile manipulator later  
 **Primary compute architecture:** Jetson + microcontroller per robot  
 **Core strengths emphasized:** Embedded systems, feedback control, sensor fusion, robot integration, ROS 2, perception, navigation, manipulation, experimentation, system reliability
 
@@ -30,7 +30,7 @@ A strong portfolio is not created by implementing the largest number of algorith
 
 1. define a robotics problem,
 2. design a clean architecture,
-3. build reliable low-level control,
+3. build reliable embedded control,
 4. integrate sensors and compute layers,
 5. choose appropriate algorithms,
 6. evaluate them quantitatively,
@@ -77,7 +77,7 @@ flowchart TD
     D --> F[Stationary Arm MCU]
     E --> G[Mobile Manipulator MCU]
 
-    F --> H[Joint Motors / Encoders / Sensors / Safety]
+    F --> H[Smart Servos / Joint Feedback / Sensors / Safety]
     G --> I[Wheel Motors / Arm Motors / Encoders / IMU / Safety]
 
     B <--> C
@@ -88,15 +88,20 @@ The architecture should communicate a clear separation:
 ### Microcontroller
 Responsible for deterministic and hardware-near tasks:
 
-- motor actuation,
-- encoder acquisition,
-- real-time control loops,
+- actuator interfacing,
+- joint-state acquisition from actuator feedback or local sensors,
+- real-time command scheduling and control loops supported by the hardware,
 - basic filtering,
 - watchdogs,
 - limit enforcement,
 - hardware safety states,
 - timestamped telemetry,
 - low-level communication.
+
+For the initial stationary-arm platform, the microcontroller is the ESP32 already on the RoArm M3.
+The project will not rely on Waveshare firmware.
+The goal is to implement custom firmware with a platform-independent architecture and a RoArm-specific smart-servo backend.
+This first backend owns protocol handling, command scheduling, telemetry, safety, and joint abstraction, but it does not assume raw PWM/current control of each servo.
 
 ### Jetson
 Responsible for computationally heavier or non-hard-real-time tasks:
@@ -140,13 +145,14 @@ These items should be completed unless prevented by hardware limitations.
 
 ### Embedded
 - MCU hardware abstraction
-- motor / actuator interface
-- encoder / joint-state acquisition
+- actuator interface
+- joint-state acquisition from smart-servo feedback or local sensors
 - watchdog
 - fault-state handling
 - command protocol
 - telemetry
 - reusable firmware structure
+- platform capability abstraction
 
 ### Stationary robot
 - joint-space feedback control
@@ -257,7 +263,7 @@ A good weekly outcome is an observable capability.
 
 Examples:
 
-- encoder readings are reliable,
+- joint feedback readings are reliable,
 - one joint follows a target,
 - trajectory tracking works,
 - FK agrees with physical measurements,
@@ -278,7 +284,7 @@ The project should intentionally spread spending over time.
 Buy:
 
 - stationary robot arm,
-- MCU,
+- debug / recovery interface for the onboard ESP32 if needed,
 - required power components,
 - communication interface,
 - emergency-stop / disable mechanism if practical,
@@ -351,6 +357,14 @@ Prioritize:
 
 A cheap arm with an open protocol is better for this project than a mechanically superior arm hidden behind a closed controller.
 
+Selected initial platform: **RoArm M3** with custom firmware on the onboard ESP32 and direct control of the smart-servo communication path.
+
+Implication:
+
+- the first firmware backend should target smart servos rather than raw motor drivers,
+- the embedded architecture must stay platform-independent so a future low-level motor backend can be added,
+- torque/current-level manipulator control is deferred until later hardware supports it.
+
 ---
 
 ## 7.2 Microcontroller
@@ -358,11 +372,11 @@ A cheap arm with an open protocol is better for this project than a mechanically
 Preferred capabilities:
 
 - sufficient timers,
-- encoder interfaces,
-- PWM,
+- UART for smart-servo communication,
+- encoder interfaces when future hardware needs them,
+- PWM when future hardware needs it,
 - ADC,
 - DMA,
-- UART,
 - SPI,
 - I2C,
 - CAN if possible,
@@ -371,7 +385,9 @@ Preferred capabilities:
 - FreeRTOS compatibility,
 - good debugging interface.
 
-Candidate families may include STM32-class MCUs.
+Initial platform target: **ESP32** on the RoArm M3.
+
+Future portable targets may include STM32-class MCUs or other FreeRTOS-capable controllers.
 
 ---
 
@@ -450,12 +466,14 @@ firmware/
 │   └── timebase/
 │
 ├── drivers/
+│   ├── actuator/
+│   ├── smart_servo/
 │   ├── encoder/
 │   ├── imu/
 │   ├── adc/
 │   ├── motor/
 │   ├── gpio/
-│   └── can_uart/
+│   └── transport/
 │
 ├── control/
 │   ├── pid/
@@ -469,7 +487,7 @@ firmware/
 │   └── velocity_estimation/
 │
 └── platforms/
-    ├── stationary_arm/
+    ├── stationary_arm_roarm_m3/
     └── mobile_manipulator/
 ```
 
@@ -483,6 +501,7 @@ Recommended message categories:
 
 ## Commands
 - set joint target
+- set joint trajectory point
 - set wheel velocity
 - enable
 - disable
@@ -495,7 +514,7 @@ Recommended message categories:
 - joint velocity
 - wheel velocity
 - IMU data
-- motor current
+- actuator current / load if available
 - controller state
 - system timestamp
 - temperature if available
@@ -518,12 +537,13 @@ Recommended message categories:
 
 ## Main objective
 
-Establish complete communication with the stationary arm and create a dependable low-level control and measurement foundation.
+Establish complete communication with the stationary arm and create a dependable custom ESP32 firmware foundation around smart-servo actuation and joint feedback.
 
 ## Primary questions
 
 - Can I command each joint?
 - Can I read each joint?
+- Can I communicate directly with each smart servo from my own firmware?
 - What feedback is available?
 - What are the actuator limits?
 - What is the actual achievable control frequency?
@@ -539,7 +559,8 @@ Establish complete communication with the stationary arm and create a dependable
 - inspect mechanical construction,
 - identify actuators,
 - identify feedback sensors,
-- understand original controller,
+- map the onboard ESP32 role and flashing / recovery path,
+- identify the smart-servo communication path,
 - document communication method,
 - determine voltage and current requirements,
 - verify joint ranges,
@@ -562,7 +583,8 @@ Establish complete communication with the stationary arm and create a dependable
 
 Implement:
 
-- MCU communication,
+- direct smart-servo communication from the ESP32,
+- actuator discovery / ID mapping,
 - command parser,
 - joint-state acquisition,
 - timestamping,
@@ -576,20 +598,20 @@ Create a simple CLI or Python tool to:
 
 ### Exit criteria
 
-PC ↔ MCU ↔ robot communication works reliably.
+PC ↔ custom ESP32 firmware ↔ smart servos communication works reliably.
 
 ---
 
-## Week 3 — First closed-loop control
+## Week 3 — First joint-control characterization
 
 For one joint:
 
-1. identify response,
-2. create P controller,
-3. tune P,
-4. add D,
-5. evaluate PD,
-6. add I only if required.
+1. identify response to position commands,
+2. measure latency and repeatability,
+3. determine usable command/update rate,
+4. add rate limiting and command shaping,
+5. evaluate whether an outer-loop correction layer is useful,
+6. keep inner-loop ownership at the servo only until later hardware allows more.
 
 ### Baseline equations
 
@@ -598,27 +620,23 @@ e(t)=q_d(t)-q(t)
 \]
 
 \[
-u(t)=K_p e(t)
+q_c(t)=f(q_d(t), \text{limits}, \text{timing})
 \]
 
-PD:
+where \( q_c(t) \) is the command sent to the smart servo after command shaping and safety checks.
+
+If the measured interface supports it reliably, an outer-loop correction layer may later be added:
 
 \[
-u(t)=K_p e(t)+K_d\dot e(t)
-\]
-
-PID:
-
-\[
-u(t)=K_p e(t)+K_i\int e(t)dt+K_d\dot e(t)
+q_c(t)=q_d(t)+K_p\left(q_d(t)-q(t)\right)
 \]
 
 ### Required protections
 
-- output saturation,
+- command saturation,
 - joint limit checks,
-- derivative filtering,
-- anti-windup if integral is used,
+- communication timeout handling,
+- derivative filtering if an outer loop is used,
 - watchdog.
 
 ### Measurements
@@ -627,6 +645,7 @@ u(t)=K_p e(t)+K_i\int e(t)dt+K_d\dot e(t)
 - settling time,
 - overshoot,
 - steady-state error,
+- command latency,
 - RMS tracking error.
 
 ---
@@ -635,8 +654,8 @@ u(t)=K_p e(t)+K_i\int e(t)dt+K_d\dot e(t)
 
 ### Actions
 
-- repeat control on all joints,
-- synchronize sampling,
+- repeat characterization on all joints,
+- synchronize command scheduling and feedback sampling,
 - implement joint-state structure,
 - add controller configuration,
 - introduce state machine.
@@ -657,7 +676,8 @@ ESTOP
 
 - every joint is commandable,
 - every joint is measurable,
-- low-level control is stable,
+- custom ESP32 firmware is stable,
+- joint command and feedback behavior is characterized,
 - faults are detectable,
 - data logging works,
 - first engineering report is written.
@@ -668,7 +688,7 @@ ESTOP
 
 ## Main objective
 
-Transform experimental code into a reusable robotics firmware platform.
+Transform experimental code into a reusable, platform-independent robotics firmware platform with the RoArm smart-servo backend as the first implementation.
 
 ---
 
@@ -677,6 +697,8 @@ Transform experimental code into a reusable robotics firmware platform.
 Refactor:
 
 - hardware abstraction,
+- actuator abstraction,
+- smart-servo driver,
 - drivers,
 - scheduler,
 - diagnostics,
@@ -694,13 +716,14 @@ Create task groups.
 Example:
 
 ### Fast
-- actuator control
-- encoder acquisition
+- actuator feedback polling
+- actuator command scheduling
+- safety checks
 
 ### Medium
 - velocity estimation
 - safety
-- controller update
+- outer-loop controller update if used
 
 ### Slow
 - communication
@@ -747,6 +770,8 @@ q(T)=q_f
 
 Compare smoothness, tracking, and actuator behavior.
 
+Treat the RoArm implementation as the first backend of a generic actuator interface rather than the final shape of the firmware.
+
 ---
 
 ## Week 8 — Benchmarking
@@ -759,7 +784,7 @@ Record:
 - actual position,
 - desired velocity,
 - actual velocity,
-- control effort,
+- actuator command,
 - controller state,
 - timestamp.
 
@@ -767,7 +792,7 @@ Generate plots.
 
 ### Month 2 exit criteria
 
-The arm executes repeatable synchronized trajectories using the new firmware framework.
+The arm executes repeatable synchronized trajectories using the new firmware framework and the custom RoArm backend.
 
 ---
 
@@ -862,9 +887,9 @@ ros2_control
   ↓
 custom hardware interface
   ↓
-MCU / robot controller
+custom ESP32 firmware
   ↓
-actuators
+smart servos
 ```
 
 ### Month 3 exit criteria
@@ -2259,8 +2284,8 @@ Maintain and update this table.
 
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Closed robot API | High | Verify interface before purchase |
-| Poor joint feedback | High | Prefer encoder-accessible arm |
+| Smart-servo protocol limitations | High | Measure update rate early and design a capability-based actuator abstraction |
+| Limited joint telemetry quality | High | Validate feedback fields and characterize repeatability during Month 1 |
 | Actuator backlash | Medium | Characterize and compensate |
 | Jetson compatibility issue | Medium | Develop on PC first |
 | ROS package conflict | Medium | Containerize / pin versions |

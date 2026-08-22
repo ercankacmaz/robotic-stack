@@ -20,9 +20,10 @@ Current contents:
 
 - repository instructions in `AGENTS.md`,
 - development workflow in `docs/development/GIT_WORKFLOW.md`,
-- portfolio roadmap in `docs/plans/robotic-stack-plan.md`.
+- portfolio roadmap in `docs/plans/robotic-stack-plan.md`,
+- initial firmware skeleton in `firmware/`.
 
-Implementation work has not started yet.
+Implementation has not started yet beyond repository bootstrap and initial firmware structure.
 
 ## Planned Repository Structure
 

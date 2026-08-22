@@ -34,6 +34,7 @@ jobs:
           test -f .github/pull_request_template.md
           test -f docs/development/GIT_WORKFLOW.md
           test -f docs/plans/robotic-stack-plan.md
+          test -f firmware/README.md
 
       - name: Verify README references current documentation paths
         run: |

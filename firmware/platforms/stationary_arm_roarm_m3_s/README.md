@@ -1,6 +1,6 @@
-# Stationary Arm RoArm M3
+# Stationary Arm — Waveshare RoArm-M3-S
 
-`platforms/stationary_arm_roarm_m3/` is the robot-specific composition layer for the first platform.
+`platforms/stationary_arm_roarm_m3_s/` is the robot-specific composition layer for the first platform, the Waveshare RoArm-M3-S.
 
 This subtree should eventually assemble:
 

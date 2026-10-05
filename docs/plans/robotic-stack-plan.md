@@ -5,7 +5,7 @@
 **Primary goal:** Build a credible, technically deep portfolio that demonstrates the ability to design, implement, integrate, test, and document robotic systems from embedded control up to autonomous multi-robot behavior.  
 **Planned duration:** 9 months  
 **Recommended workload:** 12–15 hours/week average  
-**Primary hardware sequence:** Stationary robot arm first (RoArm M3 with custom ESP32 firmware) → mobile manipulator later  
+**Primary hardware sequence:** Stationary robot arm first (Waveshare RoArm-M3-S with custom ESP32 firmware) → mobile manipulator later
 **Primary compute architecture:** Jetson + microcontroller per robot  
 **Core strengths emphasized:** Embedded systems, feedback control, sensor fusion, robot integration, ROS 2, perception, navigation, manipulation, experimentation, system reliability
 
@@ -13,7 +13,7 @@
 
 ## 1. Purpose of This Document
 
-This README is the main engineering reference for the complete nine-month portfolio project.
+This roadmap is the main planning reference for the complete nine-month portfolio project.
 
 It should be treated as a **living document**. The project is expected to evolve as:
 
@@ -37,6 +37,19 @@ A strong portfolio is not created by implementing the largest number of algorith
 7. handle failures,
 8. document decisions,
 9. build a complete working robotic application.
+
+## 1.1 Status Vocabulary
+
+Use these terms consistently throughout the project:
+
+- **Confirmed project decision:** a direction explicitly selected for the project, such as the Waveshare RoArm-M3-S or ESP-IDF + FreeRTOS.
+- **Vendor specification:** a value or capability stated by the manufacturer but not yet independently verified.
+- **Assumption:** a temporary value or behavior used to make progress and clearly marked for later verification.
+- **Implemented:** present in the repository and validated at the stated software level.
+- **Hardware-validated:** observed on the physical robot using a recorded procedure.
+- **Measured:** supported by recorded data, conditions, and results.
+
+Planned architecture and selected technologies must not be described as implemented or hardware-validated until evidence exists.
 
 ---
 
@@ -98,7 +111,7 @@ Responsible for deterministic and hardware-near tasks:
 - timestamped telemetry,
 - low-level communication.
 
-For the initial stationary-arm platform, the microcontroller is the ESP32 already on the RoArm M3.
+For the initial stationary-arm platform, the microcontroller target is the ESP32 onboard the Waveshare RoArm-M3-S.
 The project will not rely on Waveshare firmware.
 The goal is to implement custom firmware with a platform-independent architecture and a RoArm-specific smart-servo backend.
 This first backend owns protocol handling, command scheduling, telemetry, safety, and joint abstraction, but it does not assume raw PWM/current control of each servo.
@@ -357,7 +370,7 @@ Prioritize:
 
 A cheap arm with an open protocol is better for this project than a mechanically superior arm hidden behind a closed controller.
 
-Selected initial platform: **RoArm M3** with custom firmware on the onboard ESP32 and direct control of the smart-servo communication path.
+Selected initial platform: **Waveshare RoArm-M3-S** with custom firmware on the onboard ESP32 and direct control of the smart-servo communication path.
 
 Implication:
 
@@ -385,7 +398,7 @@ Preferred capabilities:
 - FreeRTOS compatibility,
 - good debugging interface.
 
-Initial platform target: **ESP32** on the RoArm M3.
+Initial platform target: **ESP32** onboard the Waveshare RoArm-M3-S.
 
 Future portable targets may include STM32-class MCUs or other FreeRTOS-capable controllers.
 
@@ -487,7 +500,7 @@ firmware/
 │   └── velocity_estimation/
 │
 └── platforms/
-    ├── stationary_arm_roarm_m3/
+    ├── stationary_arm_roarm_m3_s/
     └── mobile_manipulator/
 ```
 

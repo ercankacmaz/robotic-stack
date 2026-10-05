@@ -1460,7 +1460,7 @@ feat(protocol): add mock RoArm transport (#11)
 Task:
 
 ```text
-Establish bidirectional communication with physical RoArm M3-S.
+Establish bidirectional communication with the physical Waveshare RoArm-M3-S.
 ```
 
 Suggested branch:

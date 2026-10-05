@@ -1,6 +1,6 @@
 # robotic-stack
 
-`robotic-stack` is a robotics portfolio monorepo for building and validating a reusable robotics architecture from embedded control up to integrated robotic applications.
+`robotic-stack` is a robotics portfolio monorepo for building and validating a reusable robotics architecture from embedded control up to integrated robotic applications. The first physical platform is the **Waveshare RoArm-M3-S**, using its onboard ESP32 with **ESP-IDF + FreeRTOS**.
 
 The planned development path is:
 
@@ -14,16 +14,17 @@ The goal is not to collect disconnected demos. The goal is to show reliable, mea
 
 ## Current Status
 
-This repository is at the initial bootstrap stage.
+This repository is in the Milestone 1 firmware-foundation stage.
 
 Current contents:
 
 - repository instructions in `AGENTS.md`,
 - development workflow in `docs/development/GIT_WORKFLOW.md`,
 - portfolio roadmap in `docs/plans/robotic-stack-plan.md`,
+- current project state in `docs/status/CURRENT.md`,
 - initial firmware skeleton in `firmware/`.
 
-Implementation has not started yet beyond repository bootstrap and initial firmware structure.
+Repository bootstrap, initial CI, and the firmware directory structure exist. Firmware source code, build configuration, automated firmware tests, and physical robot validation have not started yet.
 
 ## Planned Repository Structure
 
@@ -45,6 +46,13 @@ robotic-stack/
 
 This structure will be introduced incrementally. Directories should only be added when they support real work.
 
+## Working Model
+
+- The **Robotic Stack ChatGPT Project** supports architecture, research, learning, requirements, planning, and review.
+- **Codex** works directly in the repository to implement, validate, document, and report changes.
+- The **repository** is the durable source of truth between them; important decisions and verified results must not live only in chat history.
+- Detailed Codex rules are in `AGENTS.md`. The current objective and blockers are in `docs/status/CURRENT.md`.
+
 ## Workflow
 
 This repository follows a branch-based workflow:
@@ -62,5 +70,6 @@ Detailed workflow rules are documented in `docs/development/GIT_WORKFLOW.md`.
 - `AGENTS.md`
 - `docs/development/GIT_WORKFLOW.md`
 - `docs/plans/robotic-stack-plan.md`
+- `docs/status/CURRENT.md`
 
-These documents define the repository constraints, workflow, and project direction.
+These documents define the repository constraints, workflow, direction, and current state.

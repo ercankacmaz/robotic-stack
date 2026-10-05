@@ -4,7 +4,7 @@ This directory contains MCU and RTOS-facing software for the robotics portfolio.
 
 The initial firmware baseline is designed for:
 
-- `ESP-IDF + FreeRTOS` on the RoArm M3 onboard ESP32,
+- `ESP-IDF + FreeRTOS` on the Waveshare RoArm-M3-S onboard ESP32,
 - a reusable firmware core that does not depend directly on ESP-IDF headers,
 - host-side unit tests for portable logic,
 - future migration to additional MCU platforms without rewriting the control and safety layers.
